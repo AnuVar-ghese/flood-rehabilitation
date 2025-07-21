@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation"
 interface User {
   name: string
   email: string
-  role: "refugee" | "volunteer"
+  role: "refugee" | "volunteer" | "admin"
   contact: string
   age?: number
   address?: string
@@ -182,6 +182,11 @@ export default function HomePage() {
                 className="text-blue-600 hover:text-blue-800 font-medium"
               >
                 Dashboard
+              </button>
+            )}
+            {currentUser?.role === "admin" && (
+              <button onClick={() => router.push("/admin")} className="text-red-600 hover:text-red-800 font-medium">
+                Admin Panel
               </button>
             )}
             {!currentUser ? (

@@ -243,14 +243,7 @@ export default function CampsPage() {
   }
 
   const handleLogout = () => {
-    if (confirm("Are you sure you want to logout? This will also cancel any camp selections.")) {
-      // Cancel any camp selections before logout
-      if (userSelection) {
-        const updatedCamps = camps.map((c) => (c.id === userSelection.campId ? { ...c, beds: c.beds + 1 } : c))
-        saveCamps(updatedCamps)
-        clearUserSelection()
-      }
-
+    if (confirm("Are you sure you want to logout?")) {
       localStorage.removeItem("currentUser")
       router.push("/")
     }

@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation"
 interface User {
   name: string
   email: string
-  role: "refugee" | "volunteer"
+  role: "refugee" | "volunteer" | "admin"
   contact: string
 }
 
@@ -24,6 +24,8 @@ export default function LoginPage() {
       setTimeout(() => {
         if (currentUser.role === "volunteer") {
           router.push("/dashboard")
+        } else if (currentUser.role === "admin") {
+          router.push("/admin")
         } else {
           router.push("/camps")
         }
@@ -65,7 +67,28 @@ export default function LoginPage() {
       return
     }
 
-    // Get stored users and validate credentials
+    // Check for admin credentials
+    if (email === "admin@gmail.com" && password === "admin@123") {
+      const adminUser = {
+        name: "Administrator",
+        email: "admin@gmail.com",
+        role: "admin" as const,
+        contact: "Admin Contact",
+      }
+
+      if (setCurrentUser(adminUser)) {
+        alert("Welcome, Administrator!")
+        setTimeout(() => {
+          router.push("/admin")
+        }, 1000)
+      } else {
+        alert("Login failed. Please try again.")
+      }
+      setIsLoading(false)
+      return
+    }
+
+    // Get stored users and validate credentials for regular users
     const storedUsers = getStoredUsers()
     const user = storedUsers.find((u) => u.email === email && u.password === password)
 

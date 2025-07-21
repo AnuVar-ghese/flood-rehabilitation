@@ -191,6 +191,28 @@ export default function DashboardPage() {
     }
   }
 
+  const addActivityLog = (type: string, description: string) => {
+    try {
+      const logs = localStorage.getItem("adminActivities")
+      const allLogs = logs ? JSON.parse(logs) : []
+
+      const newLog = {
+        id: Date.now().toString(),
+        type,
+        description,
+        timestamp: new Date().toISOString(),
+        user: currentUser?.name || "Unknown",
+      }
+
+      allLogs.unshift(newLog)
+      // Keep only last 100 activities
+      const limitedLogs = allLogs.slice(0, 100)
+      localStorage.setItem("adminActivities", JSON.stringify(limitedLogs))
+    } catch (error) {
+      console.error("Error adding activity log:", error)
+    }
+  }
+
   const handleAddCamp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsSubmitting(true)
@@ -226,6 +248,7 @@ export default function DashboardPage() {
 
     const updatedCamps = [...camps, newCamp]
     if (saveCamps(updatedCamps)) {
+      addActivityLog("camp_created", `New camp "${newCamp.name}" was created by volunteer ${currentUser?.name}`)
       alert(`Camp "${newCamp.name}" added successfully! It will now appear on the camps page.`)
       e.currentTarget.reset()
     } else {
@@ -242,6 +265,7 @@ export default function DashboardPage() {
     if (confirm(`Are you sure you want to remove "${camp.name}"? This action cannot be undone.`)) {
       const updatedCamps = camps.filter((c) => c.id !== campId)
       if (saveCamps(updatedCamps)) {
+        addActivityLog("camp_deleted", `Camp "${camp.name}" was removed by volunteer ${currentUser?.name}`)
         alert("Camp removed successfully! Changes will be reflected on the camps page.")
       } else {
         alert("Failed to remove camp. Please try again.")
@@ -264,6 +288,7 @@ export default function DashboardPage() {
     if (!camp) return
 
     if (saveVolunteerAssignment(camp.name)) {
+      addActivityLog("volunteer_assignment", `${currentUser?.name} volunteered at ${camp.name}`)
       alert(`Thank you, ${currentUser?.name}, for volunteering at "${camp.name}"!`)
       e.currentTarget.reset()
     } else {
